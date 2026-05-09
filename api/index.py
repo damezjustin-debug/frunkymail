@@ -2,24 +2,18 @@ from flask import Flask, request, jsonify
 
 app = Flask(__name__)
 
-# Tambahin route buat ngetes di browser (Home)
+# Ini buat ngetes di browser: https://frunkymail.vercel.app/
 @app.route('/')
-def home():
-    return "Server FrunkyMail Aktif, Kirim POST ke /email-handler."
+def hello():
+    return "<h1>FrunkyMail is Online!</h1><p>Kirim POST ke /api/index buat email.</p>"
 
-# Route buat nerima email
-@app.route('/email-handler', methods=['GET', 'POST']) # Tambahin GET biar bisa dibuka browser
-def handle_email():
+# Ini buat nerima data email dari Cloudflare
+@app.route('/api/index', methods=['POST', 'GET'])
+def email_receiver():
     if request.method == 'POST':
-        data = request.json or {}
-        sender = data.get('from', 'Unknown')
-        subject = data.get('subject', 'No Subject')
-        print(f"Email masuk: {subject}")
-        return jsonify({"status": "Email received!"}), 200
-    
-    # Kalau dibuka lewat browser (GET) munculin ini
-    return jsonify({"message": "Gunakan POST buat kirim data email"}), 200
+        data = request.json
+        return jsonify({"status": "diterima", "data": data}), 200
+    return jsonify({"status": "ready", "note": "Gunakan POST buat kirim email"}), 200
 
-# Entry point buat Vercel
-def handler(event, context):
-    return app(event, context)
+# Vercel butuh ini buat ngenalin Flask-nya
+app = app
